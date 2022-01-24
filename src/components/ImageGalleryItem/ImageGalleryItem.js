@@ -1,8 +1,9 @@
+import { GalleryItem, Img } from "./ImageGalleryItem.styled";
+
 export default function ImageGalleryItem({ pictureItem }) {
-  // console.log(webformatURL);
   return (
-    <li className="gallery-item">
-      <img src={pictureItem.webformatURL} alt="" />
-    </li>
+    <GalleryItem>
+      <Img src={pictureItem.webformatURL} alt={pictureItem.tags} />
+    </GalleryItem>
   );
 }

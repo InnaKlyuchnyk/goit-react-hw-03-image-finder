@@ -2,41 +2,75 @@ import { Component } from "react";
 import { ToastContainer } from "react-toastify";
 import Searchbar from "./components/Searchbar";
 import ImageGallery from "./components/ImageGallery";
+import LoadMoreButton from "./components/Button-load-more";
+
 const BASE_URL = "https://pixabay.com/api/";
 const API_KEY = "24436915-6043b65348ea2ff9e087fc098";
+let PAGE = 1;
 
 class App extends Component {
-  state = { pictures: null, loading: false, serchQuery: "" };
+  state = {
+    pictures: null,
+    serchQuery: "",
+    status: "idle",
+  };
 
-  componentDidMount() {}
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.serchQuery !== this.state.serchQuery) {
-      this.setState({ loading: true });
+    const { serchQuery } = this.state;
+
+    if (prevState.serchQuery !== serchQuery) {
+      this.setState({ status: "pending" });
       fetch(
-        `${BASE_URL}?q=${this.state.serchQuery}&page=1&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
+        `${BASE_URL}?q=${serchQuery}&page=${PAGE}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
       )
-        .then((response) => response.json())
-        .then((data) => {
-          this.setState({ pictures: data.hits });
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          }
+          return Promise.reject(
+            new Error(`По запросу ${serchQuery}ничего не найдено`)
+          );
         })
-        .finally(() => {
-          this.setState({ loading: false });
-        });
+        .then((data) => {
+          this.setState({ pictures: data.hits, status: "resolved" });
+        })
+        .catch(() => this.setState({ status: "rejected" }));
     }
   }
 
   formSubmitHandler = ({ serchQuery }) => {
     this.setState({ serchQuery });
   };
-  render() {
-    const { loading, pictures } = this.state;
 
+  onLoadMoreClick = () => {
+    PAGE += 1;
+    console.log(PAGE);
+  };
+
+  checkStatus = () => {
+    const { pictures, serchQuery, status } = this.state;
+
+    if (status === "pending") {
+      return <h1>Загружаем...</h1>;
+    }
+    if (status === "rejected" || (pictures !== null && pictures.length === 0)) {
+      return <p>По запросу {serchQuery} ничего не найдено</p>;
+    }
+    if (status === "resolved") {
+      return (
+        <>
+          <ImageGallery picturesList={pictures} />
+          <LoadMoreButton onClick={this.onLoadMoreClick} />
+        </>
+      );
+    }
+  };
+
+  render() {
     return (
       <>
         <Searchbar onSubmit={this.formSubmitHandler} />
-        {loading && <h1>Загружаем...</h1>}
-        {pictures && <ImageGallery picturesList={this.state.pictures} />}
-        {pictures !== null && pictures.length === 0 && <p>Ничего не найдено</p>}
+        {this.checkStatus()}
         <ToastContainer />
       </>
     );

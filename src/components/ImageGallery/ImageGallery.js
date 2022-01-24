@@ -1,12 +1,12 @@
 import ImageGalleryItem from "../ImageGalleryItem";
+import { GalleryList } from "./ImageGallery.styled";
 
 export default function ImageGallery({ picturesList }) {
-  console.log("в списке", picturesList);
   return (
-    <ul className="gallery">
+    <GalleryList>
       {picturesList.map((picture) => {
         return <ImageGalleryItem key={picture.id} pictureItem={picture} />;
       })}
-    </ul>
+    </GalleryList>
   );
 }
