@@ -3,25 +3,29 @@ import { ToastContainer } from "react-toastify";
 import Searchbar from "./components/Searchbar";
 import ImageGallery from "./components/ImageGallery";
 import LoadMoreButton from "./components/Button-load-more";
+import Modal from "./components/Modal";
 
 const BASE_URL = "https://pixabay.com/api/";
 const API_KEY = "24436915-6043b65348ea2ff9e087fc098";
-let PAGE = 1;
 
 class App extends Component {
   state = {
-    pictures: null,
+    pictures: [],
     serchQuery: "",
     status: "idle",
+    currentPage: 1,
+    showModal: false,
   };
 
   componentDidUpdate(prevProps, prevState) {
-    const { serchQuery } = this.state;
+    const { serchQuery, currentPage } = this.state;
 
-    if (prevState.serchQuery !== serchQuery) {
-      this.setState({ status: "pending" });
+    if (
+      prevState.serchQuery !== serchQuery ||
+      prevState.currentPage !== currentPage
+    ) {
       fetch(
-        `${BASE_URL}?q=${serchQuery}&page=${PAGE}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
+        `${BASE_URL}?q=${serchQuery}&page=${currentPage}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
       )
         .then((response) => {
           if (response.ok) {
@@ -32,34 +36,42 @@ class App extends Component {
           );
         })
         .then((data) => {
-          this.setState({ pictures: data.hits, status: "resolved" });
+          this.setState((prevState) => ({
+            status: "resolved",
+            pictures: [...prevState.pictures, ...data.hits],
+          }));
         })
         .catch(() => this.setState({ status: "rejected" }));
     }
   }
-
+  //
   formSubmitHandler = ({ serchQuery }) => {
-    this.setState({ serchQuery });
+    this.setState({ serchQuery, currentPage: 1, pictures: [] });
   };
 
   onLoadMoreClick = () => {
-    PAGE += 1;
-    console.log(PAGE);
+    this.setState((prevState) => ({
+      currentPage: (prevState.currentPage += 1),
+    }));
+  };
+
+  toggleModal = () => {
+    this.setState(({ showModal }) => ({
+      showModal: !showModal,
+    }));
   };
 
   checkStatus = () => {
-    const { pictures, serchQuery, status } = this.state;
+    const { pictures, status } = this.state;
 
     if (status === "pending") {
       return <h1>Загружаем...</h1>;
     }
-    if (status === "rejected" || (pictures !== null && pictures.length === 0)) {
-      return <p>По запросу {serchQuery} ничего не найдено</p>;
-    }
+
     if (status === "resolved") {
       return (
         <>
-          <ImageGallery picturesList={pictures} />
+          <ImageGallery picturesList={pictures} openModal={this.toggleModal} />
           <LoadMoreButton onClick={this.onLoadMoreClick} />
         </>
       );
@@ -67,10 +79,17 @@ class App extends Component {
   };
 
   render() {
+    const { showModal } = this.state;
     return (
       <>
         <Searchbar onSubmit={this.formSubmitHandler} />
         {this.checkStatus()}
+        {showModal && (
+          <Modal onClose={this.toggleModal}>
+            <img src="" alt="" />
+          </Modal>
+        )}
+
         <ToastContainer />
       </>
     );
