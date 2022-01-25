@@ -1,12 +1,8 @@
 import { Component } from "react";
 import { toast } from "react-toastify";
-import {
-  Header,
-  SerchForm,
-  Input,
-  SerchButton,
-  ButtonLabel,
-} from "./Serchbar.styled";
+import { Header, SerchForm, Input } from "./Serchbar.styled";
+import IconButton from "../Icon-Button/Icon-Button";
+import { ReactComponent as SerchIcon } from "../../icons/serch.svg";
 
 export default class Searchbar extends Component {
   state = {
@@ -24,16 +20,15 @@ export default class Searchbar extends Component {
       return alert("Type something please");
     }
     this.props.onSubmit(this.state);
-    // this.setState({ serchQuery: "" });
   };
 
   render() {
     return (
       <Header>
         <SerchForm onSubmit={this.handleSubmit}>
-          <SerchButton type="submit">
-            <ButtonLabel></ButtonLabel>
-          </SerchButton>
+          <IconButton type="submit">
+            <SerchIcon width="32" heigth="32" />
+          </IconButton>
 
           <Input
             className="input"

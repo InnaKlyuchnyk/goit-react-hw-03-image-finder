@@ -1,7 +1,7 @@
 import ImageGalleryItem from "../ImageGalleryItem";
 import { GalleryList } from "./ImageGallery.styled";
 
-export default function ImageGallery({ picturesList, openModal }) {
+export default function ImageGallery({ picturesList, openModal, getLargeImg }) {
   return (
     <GalleryList>
       {picturesList.map((picture) => {
@@ -10,6 +10,7 @@ export default function ImageGallery({ picturesList, openModal }) {
             key={picture.id}
             pictureItem={picture}
             openModal={openModal}
+            getLargeImg={getLargeImg}
           />
         );
       })}

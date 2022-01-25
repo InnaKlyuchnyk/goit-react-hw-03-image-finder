@@ -15,6 +15,7 @@ class App extends Component {
     status: "idle",
     currentPage: 1,
     showModal: false,
+    largeImg: [],
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -44,7 +45,17 @@ class App extends Component {
         .catch(() => this.setState({ status: "rejected" }));
     }
   }
-  //
+  getLargeImg = (largeImageURL, id) => {
+    const newImg = { id, largeImageURL };
+    // console.log(newImg);
+
+    // this.setState((prevState) => ({
+    //   largeImg: [...prevState.largeImg, newImg],
+    // }));
+
+    // console.log(this.state.largeImg);
+  };
+
   formSubmitHandler = ({ serchQuery }) => {
     this.setState({ serchQuery, currentPage: 1, pictures: [] });
   };
@@ -55,7 +66,9 @@ class App extends Component {
     }));
   };
 
-  toggleModal = () => {
+  toggleModal = (event) => {
+    // console.log(event.currentTarget.id);
+
     this.setState(({ showModal }) => ({
       showModal: !showModal,
     }));
@@ -71,7 +84,11 @@ class App extends Component {
     if (status === "resolved") {
       return (
         <>
-          <ImageGallery picturesList={pictures} openModal={this.toggleModal} />
+          <ImageGallery
+            picturesList={pictures}
+            openModal={this.toggleModal}
+            getLargeImg={this.getLargeImg}
+          />
           <LoadMoreButton onClick={this.onLoadMoreClick} />
         </>
       );
@@ -79,7 +96,7 @@ class App extends Component {
   };
 
   render() {
-    const { showModal } = this.state;
+    const { showModal, largeImg } = this.state;
     return (
       <>
         <Searchbar onSubmit={this.formSubmitHandler} />
