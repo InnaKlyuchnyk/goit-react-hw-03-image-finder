@@ -40,7 +40,6 @@ class App extends Component {
           );
         })
         .then((data) => {
-          console.log(data.totalHits);
           this.setState((prevState) => ({
             status: "resolved",
             pictures: [...prevState.pictures, ...data.hits],

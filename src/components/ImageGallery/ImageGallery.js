@@ -1,5 +1,6 @@
 import ImageGalleryItem from "../ImageGalleryItem";
 import { GalleryList } from "./ImageGallery.styled";
+import PropTypes from "prop-types";
 
 export default function ImageGallery({ picturesList, openModal }) {
   return (
@@ -20,3 +21,8 @@ export default function ImageGallery({ picturesList, openModal }) {
     </GalleryList>
   );
 }
+
+ImageGallery.propTypes = {
+  picturesList: PropTypes.array,
+  openModal: PropTypes.func,
+};
