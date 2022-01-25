@@ -1,5 +1,6 @@
 import { Component } from "react";
 import { ToastContainer } from "react-toastify";
+import { SpinnerDotted } from "spinners-react";
 import Searchbar from "./components/Searchbar";
 import ImageGallery from "./components/ImageGallery";
 import LoadMoreButton from "./components/Button-load-more";
@@ -13,13 +14,15 @@ class App extends Component {
     pictures: [],
     serchQuery: "",
     status: "idle",
-    currentPage: 1,
+    currentPage: 0,
     showModal: false,
-    largeImg: [],
+    largeImg: "",
+    tags: "",
+    totalHits: 0,
   };
 
   componentDidUpdate(prevProps, prevState) {
-    const { serchQuery, currentPage } = this.state;
+    const { serchQuery, currentPage, totalHits } = this.state;
 
     if (
       prevState.serchQuery !== serchQuery ||
@@ -37,73 +40,78 @@ class App extends Component {
           );
         })
         .then((data) => {
+          console.log(data.totalHits);
           this.setState((prevState) => ({
             status: "resolved",
             pictures: [...prevState.pictures, ...data.hits],
+            totalHits: data.totalHits,
           }));
+
+          if (totalHits === this.state.pictures.length) {
+            this.setState({ status: "idle" });
+          }
         })
         .catch(() => this.setState({ status: "rejected" }));
     }
   }
-  getLargeImg = (largeImageURL, id) => {
-    const newImg = { id, largeImageURL };
-    // console.log(newImg);
-
-    // this.setState((prevState) => ({
-    //   largeImg: [...prevState.largeImg, newImg],
-    // }));
-
-    // console.log(this.state.largeImg);
-  };
 
   formSubmitHandler = ({ serchQuery }) => {
-    this.setState({ serchQuery, currentPage: 1, pictures: [] });
+    this.setState({
+      serchQuery,
+      currentPage: 1,
+      pictures: [],
+      status: "pending",
+    });
   };
 
   onLoadMoreClick = () => {
     this.setState((prevState) => ({
       currentPage: (prevState.currentPage += 1),
+      status: "pending",
     }));
   };
 
-  toggleModal = (event) => {
-    // console.log(event.currentTarget.id);
-
+  toggleModal = (largeImg, tags) => {
     this.setState(({ showModal }) => ({
       showModal: !showModal,
+      largeImg,
+      tags,
     }));
   };
 
   checkStatus = () => {
-    const { pictures, status } = this.state;
+    const { status } = this.state;
 
     if (status === "pending") {
-      return <h1>Загружаем...</h1>;
+      return (
+        <SpinnerDotted
+          size={80}
+          color="rgb(130, 183, 231)"
+          thickness={100}
+          style={{
+            display: "block",
+            margin: "0 auto",
+            marginTop: "16px",
+          }}
+        />
+      );
     }
 
     if (status === "resolved") {
-      return (
-        <>
-          <ImageGallery
-            picturesList={pictures}
-            openModal={this.toggleModal}
-            getLargeImg={this.getLargeImg}
-          />
-          <LoadMoreButton onClick={this.onLoadMoreClick} />
-        </>
-      );
+      return <LoadMoreButton onClick={this.onLoadMoreClick} />;
     }
   };
 
   render() {
-    const { showModal, largeImg } = this.state;
+    const { showModal, largeImg, tags, pictures } = this.state;
     return (
       <>
         <Searchbar onSubmit={this.formSubmitHandler} />
+        <ImageGallery picturesList={pictures} openModal={this.toggleModal} />
         {this.checkStatus()}
         {showModal && (
           <Modal onClose={this.toggleModal}>
-            <img src="" alt="" />
+            <img src={largeImg} alt={tags} />
           </Modal>
         )}
 

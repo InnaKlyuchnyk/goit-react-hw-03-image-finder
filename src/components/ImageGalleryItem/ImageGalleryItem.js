@@ -1,17 +1,11 @@
 import { GalleryItem, Img } from "./ImageGalleryItem.styled";
 
-export default function ImageGalleryItem({
-  pictureItem,
-  openModal,
-  getLargeImg,
-}) {
-  const { largeImageURL, id, webformatURL, tags } = pictureItem;
-
-  getLargeImg(largeImageURL, id);
+export default function ImageGalleryItem({ pictureItem, openModal }) {
+  const { largeImageURL, webformatURL, tags } = pictureItem;
 
   return (
-    <GalleryItem>
-      <Img src={webformatURL} alt={tags} onClick={openModal} id={id} />
+    <GalleryItem onClick={() => openModal(largeImageURL, tags)}>
+      <Img src={webformatURL} alt={tags} />
     </GalleryItem>
   );
 }

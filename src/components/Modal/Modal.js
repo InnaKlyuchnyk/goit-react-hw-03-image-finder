@@ -20,8 +20,9 @@ export default class Modal extends Component {
   };
 
   handleOverlayClick = (evt) => {
-    console.log("current", evt.currentTarget);
-    console.log("target", evt.target);
+    if (evt.currentTarget === evt.target) {
+      this.props.onClose();
+    }
   };
 
   render() {

@@ -1,16 +1,19 @@
 import ImageGalleryItem from "../ImageGalleryItem";
 import { GalleryList } from "./ImageGallery.styled";
 
-export default function ImageGallery({ picturesList, openModal, getLargeImg }) {
+export default function ImageGallery({ picturesList, openModal }) {
   return (
     <GalleryList>
       {picturesList.map((picture) => {
+        const { id, webformatURL, largeImageURL } = picture;
+
         return (
           <ImageGalleryItem
-            key={picture.id}
+            key={id}
             pictureItem={picture}
             openModal={openModal}
-            getLargeImg={getLargeImg}
+            webformatURL={webformatURL}
+            largeImageURL={largeImageURL}
           />
         );
       })}
