@@ -75,6 +75,7 @@ class App extends Component {
 
   onLoadMoreClick = () => {
     console.log("клик на лоад мор");
+
     this.setState((prevState) => ({
       currentPage: (prevState.currentPage += 1),
       status: "pending",
