@@ -29,6 +29,7 @@ class App extends Component {
       prevState.currentPage !== currentPage
     ) {
       console.log("до фетча");
+      this.setState({ status: "pending" });
       fetch(
         `${BASE_URL}?q=${serchQuery}&page=${currentPage}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
       )
@@ -78,7 +79,7 @@ class App extends Component {
 
     this.setState((prevState) => ({
       currentPage: (prevState.currentPage += 1),
-      status: "pending",
+      // status: "pending",
     }));
   };
 
