@@ -1,10 +1,10 @@
 import { Component } from "react";
-import { ToastContainer } from "react-toastify";
 import { SpinnerDotted } from "spinners-react";
 import Searchbar from "./components/Searchbar";
 import ImageGallery from "./components/ImageGallery";
 import LoadMoreButton from "./components/Button-load-more";
 import Modal from "./components/Modal";
+import toast, { Toaster } from "react-hot-toast";
 
 const BASE_URL = "https://pixabay.com/api/";
 const API_KEY = "24436915-6043b65348ea2ff9e087fc098";
@@ -45,7 +45,15 @@ class App extends Component {
             pictures: [...prevState.pictures, ...data.hits],
             totalHits: data.totalHits,
           }));
-
+          if (data.hits.length === 0) {
+            this.setState({ status: "idle" });
+            toast("There is no pictures with such name", {
+              style: {
+                background: "#f1584d",
+                color: "black",
+              },
+            });
+          }
           if (totalHits === this.state.pictures.length) {
             this.setState({ status: "idle" });
           }
@@ -114,7 +122,13 @@ class App extends Component {
           </Modal>
         )}
 
-        <ToastContainer />
+        <Toaster
+          containerStyle={{
+            top: 15,
+            left: 1000,
+            right: 0,
+          }}
+        />
       </>
     );
   }

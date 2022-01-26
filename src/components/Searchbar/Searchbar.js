@@ -1,8 +1,8 @@
 import { Component } from "react";
-import { toast } from "react-toastify";
 import { Header, SerchForm, Input } from "./Serchbar.styled";
 import IconButton from "../Icon-Button/Icon-Button";
 import { ReactComponent as SerchIcon } from "../../icons/serch.svg";
+import toast from "react-hot-toast";
 
 export default class Searchbar extends Component {
   state = {
@@ -17,11 +17,15 @@ export default class Searchbar extends Component {
   handleSubmit = (event) => {
     event.preventDefault();
     if (this.state.serchQuery.trim() === "") {
-      return alert("Type something please");
+      return toast("Type something please", {
+        style: {
+          background: "#f6f7c1",
+          color: "black",
+        },
+      });
     }
     this.props.onSubmit(this.state);
   };
-
   render() {
     return (
       <Header>
