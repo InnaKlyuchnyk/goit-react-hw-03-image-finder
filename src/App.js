@@ -28,11 +28,13 @@ class App extends Component {
       prevState.serchQuery !== serchQuery ||
       prevState.currentPage !== currentPage
     ) {
+      console.log("до фетча");
       fetch(
         `${BASE_URL}?q=${serchQuery}&page=${currentPage}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
       )
         .then((response) => {
           if (response.ok) {
+            console.log("после фетча");
             return response.json();
           }
           return Promise.reject(
@@ -72,6 +74,7 @@ class App extends Component {
   };
 
   onLoadMoreClick = () => {
+    console.log("клик на лоад мор");
     this.setState((prevState) => ({
       currentPage: (prevState.currentPage += 1),
       status: "pending",
