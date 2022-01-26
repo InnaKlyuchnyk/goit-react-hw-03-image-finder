@@ -14,7 +14,7 @@ class App extends Component {
     pictures: [],
     serchQuery: "",
     status: "idle",
-    currentPage: 0,
+    currentPage: 1,
     showModal: false,
     largeImg: "",
     tags: "",
