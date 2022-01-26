@@ -78,9 +78,10 @@ class App extends Component {
 
     this.setState((prevState) => ({
       currentPage: (prevState.currentPage += 1),
+      status: "pending",
     }));
   };
-  // status: "pending",
+
   toggleModal = (largeImg, tags) => {
     this.setState(({ showModal }) => ({
       showModal: !showModal,
