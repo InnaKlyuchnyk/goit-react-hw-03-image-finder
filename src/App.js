@@ -32,19 +32,7 @@ class App extends Component {
 
       this.setState({ status: "pending" });
 
-      fetch(
-        `${BASE_URL}?q=${serchQuery}&page=${currentPage}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
-      )
-        .then((response) => {
-          if (response.ok) {
-            console.log("после фетча");
-            return response.json();
-          }
-
-          return Promise.reject(
-            new Error(`По запросу ${serchQuery}ничего не найдено`)
-          );
-        })
+      this.fetchImg(this.state)
         .then((data) => {
           this.setState((prevState) => ({
             status: "resolved",
@@ -54,7 +42,6 @@ class App extends Component {
 
           if (data.hits.length === 0) {
             this.setState({ status: "rejected" });
-
             toast("There is no pictures with such name", {
               style: {
                 background: "#f1584d",
@@ -62,14 +49,27 @@ class App extends Component {
               },
             });
           }
-
-          // if (totalHits === this.state.pictures.length) {
-          //   this.setState({ status: "idle" });
-          // }
+          if (totalHits === this.state.pictures.length) {
+            this.setState({ status: "idle" });
+          }
         })
         .catch(() => this.setState({ status: "rejected" }));
     }
   }
+
+  fetchImg = ({ serchQuery, currentPage }) => {
+    return fetch(
+      `${BASE_URL}?q=${serchQuery}&page=${currentPage}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
+    ).then((response) => {
+      if (response.ok) {
+        console.log("после фетча");
+        return response.json();
+      }
+      return Promise.reject(
+        new Error(`По запросу ${serchQuery}ничего не найдено`)
+      );
+    });
+  };
 
   formSubmitHandler = ({ serchQuery }) => {
     this.setState({
@@ -82,9 +82,11 @@ class App extends Component {
   onLoadMoreClick = () => {
     console.log("клик на лоад мор");
 
-    this.setState((prevState) => ({
-      currentPage: (prevState.currentPage += 1),
-    }));
+    this.fetchImg(this.state).then(() =>
+      this.setState((prevState) => ({
+        currentPage: (prevState.currentPage += 1),
+      }))
+    );
   };
 
   toggleModal = (largeImg, tags) => {
@@ -146,3 +148,40 @@ class App extends Component {
 export default App;
 
 // ======================
+
+// fetch(
+//   `${BASE_URL}?q=${serchQuery}&page=${currentPage}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
+// )
+//   .then((response) => {
+//     if (response.ok) {
+//       console.log("после фетча");
+//       return response.json();
+//     }
+
+//     return Promise.reject(
+//       new Error(`По запросу ${serchQuery}ничего не найдено`)
+//     );
+//   })
+//   .then((data) => {
+//     this.setState((prevState) => ({
+//       status: "resolved",
+//       pictures: [...prevState.pictures, ...data.hits],
+//       totalHits: data.totalHits,
+//     }));
+
+//     if (data.hits.length === 0) {
+//       this.setState({ status: "rejected" });
+
+//       toast("There is no pictures with such name", {
+//         style: {
+//           background: "#f1584d",
+//           color: "black",
+//         },
+//       });
+//     }
+
+//     // if (totalHits === this.state.pictures.length) {
+//     //   this.setState({ status: "idle" });
+//     // }
+//   })
+//   .catch(() => this.setState({ status: "rejected" }));
