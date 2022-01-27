@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 export default function LoadMoreButton({ onClick }) {
   return (
-    <LoadMore type="submit" onClick={onClick}>
+    <LoadMore type="button" onClick={onClick}>
       Load more
     </LoadMore>
   );
