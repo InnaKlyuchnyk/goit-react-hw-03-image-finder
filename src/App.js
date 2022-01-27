@@ -24,8 +24,6 @@ class App extends Component {
     const { searchQuery } = this.state;
 
     if (prevState.searchQuery !== searchQuery) {
-      console.log("до фетча");
-
       this.fetchImg();
     }
   }
@@ -42,7 +40,6 @@ class App extends Component {
     )
       .then((response) => {
         if (response.ok) {
-          console.log("после фетча");
           return response.json();
         }
       })
@@ -66,6 +63,7 @@ class App extends Component {
   };
 
   formSubmitHandler = (searchQuery) => {
+    console.log(searchQuery);
     this.setState({
       searchQuery: searchQuery,
       currentPage: 1,

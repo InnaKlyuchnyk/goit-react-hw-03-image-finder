@@ -24,7 +24,7 @@ export default class Searchbar extends Component {
         },
       });
     }
-    this.props.onSubmit(this.state);
+    this.props.onSubmit(this.state.serchQuery);
   };
   render() {
     return (
