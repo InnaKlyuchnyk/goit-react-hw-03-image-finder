@@ -5,12 +5,14 @@ import PropTypes from "prop-types";
 export default function ImageGallery({ picturesList, openModal }) {
   return (
     <GalleryList>
-      {picturesList.map((picture) => {
+      {picturesList.map((picture, index) => {
         const { id, webformatURL, largeImageURL } = picture;
+
+        console.log(index);
 
         return (
           <ImageGalleryItem
-            key={id}
+            key={index}
             pictureItem={picture}
             openModal={openModal}
             webformatURL={webformatURL}
