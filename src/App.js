@@ -29,7 +29,9 @@ class App extends Component {
       prevState.currentPage !== currentPage
     ) {
       console.log("до фетча");
+
       this.setState({ status: "pending" });
+
       fetch(
         `${BASE_URL}?q=${serchQuery}&page=${currentPage}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
       )
@@ -38,6 +40,7 @@ class App extends Component {
             console.log("после фетча");
             return response.json();
           }
+
           return Promise.reject(
             new Error(`По запросу ${serchQuery}ничего не найдено`)
           );
@@ -48,8 +51,10 @@ class App extends Component {
             pictures: [...prevState.pictures, ...data.hits],
             totalHits: data.totalHits,
           }));
+
           if (data.hits.length === 0) {
-            this.setState({ status: "idle" });
+            this.setState({ status: "rejected" });
+
             toast("There is no pictures with such name", {
               style: {
                 background: "#f1584d",
@@ -57,9 +62,10 @@ class App extends Component {
               },
             });
           }
-          if (totalHits === this.state.pictures.length) {
-            this.setState({ status: "idle" });
-          }
+
+          // if (totalHits === this.state.pictures.length) {
+          //   this.setState({ status: "idle" });
+          // }
         })
         .catch(() => this.setState({ status: "rejected" }));
     }
@@ -70,7 +76,6 @@ class App extends Component {
       serchQuery,
       currentPage: 1,
       pictures: [],
-      status: "pending",
     });
   };
 
@@ -79,7 +84,6 @@ class App extends Component {
 
     this.setState((prevState) => ({
       currentPage: (prevState.currentPage += 1),
-      // status: "pending",
     }));
   };
 
