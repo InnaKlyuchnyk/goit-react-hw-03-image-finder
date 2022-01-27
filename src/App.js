@@ -6,86 +6,72 @@ import LoadMoreButton from "./components/Button-load-more";
 import Modal from "./components/Modal";
 import toast, { Toaster } from "react-hot-toast";
 
-const BASE_URL = "https://pixabay.com/api/";
 const API_KEY = "24436915-6043b65348ea2ff9e087fc098";
 
 class App extends Component {
   state = {
     pictures: [],
-    serchQuery: "",
-    // status: "idle",
+    searchQuery: "",
+    isLoading: false,
     currentPage: 1,
     showModal: false,
     largeImg: "",
-    tags: "",
+    error: null,
     totalHits: 0,
-    loading: false,
   };
 
   componentDidUpdate(prevProps, prevState) {
-    const { serchQuery, currentPage, totalHits } = this.state;
+    const { searchQuery } = this.state;
 
-    if (
-      prevState.serchQuery !== serchQuery ||
-      prevState.currentPage !== currentPage
-    ) {
+    if (prevState.searchQuery !== searchQuery) {
       console.log("до фетча");
 
-      this.setState({ loading: true });
-      // this.setState({ status: "pending" });
-
-      fetch(
-        `${BASE_URL}?q=${serchQuery}&page=${currentPage}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
-      )
-        .then((response) => {
-          if (response.ok) {
-            console.log("после фетча");
-            return response.json();
-          }
-
-          return Promise.reject(
-            new Error(`По запросу ${serchQuery}ничего не найдено`)
-          );
-        })
-        .then((data) => {
-          this.setState((prevState) => ({
-            // status: "resolved",
-            pictures: [...prevState.pictures, ...data.hits],
-            totalHits: data.totalHits,
-          }));
-
-          if (data.hits.length === 0) {
-            this.setState({ status: "rejected" });
-
-            toast("There is no pictures with such name", {
-              style: {
-                background: "#f1584d",
-                color: "black",
-              },
-            });
-          }
-
-          // if (totalHits === this.state.pictures.length) {
-          //   // this.setState({ status: "idle" });
-          // }
-        });
-      // .catch(() => this.setState({ status: "rejected" }));
+      this.fetchImg();
     }
   }
 
-  formSubmitHandler = ({ serchQuery }) => {
-    this.setState({
-      serchQuery,
-      currentPage: 1,
-      pictures: [],
-    });
+  fetchImg = () => {
+    const { currentPage, searchQuery } = this.state;
+
+    if (!searchQuery) return;
+
+    this.setState({ isLoading: true });
+
+    return fetch(
+      `https://pixabay.com/api/?q=${searchQuery}&page=${currentPage}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
+    )
+      .then((response) => {
+        if (response.ok) {
+          console.log("после фетча");
+          return response.json();
+        }
+      })
+      .then((data) => {
+        console.log(data);
+        this.setState((prevState) => ({
+          pictures: [...prevState.pictures, ...data.hits],
+          currentPage: prevState.currentPage + 1,
+          totalHits: data.total,
+        }));
+
+        window.scrollTo({
+          top: document.documentElement.scrollHeight,
+          behavior: "smooth",
+        });
+      })
+      .catch((error) => this.setState({ error }))
+      .finally(() => {
+        this.setState({ isLoading: false });
+      });
   };
 
-  onLoadMoreClick = () => {
-    console.log("клик на лоад мор");
-    this.setState((prevProps) => ({
-      currentPage: (prevProps.currentPage += 1),
-    }));
+  formSubmitHandler = (searchQuery) => {
+    this.setState({
+      searchQuery: searchQuery,
+      currentPage: 1,
+      pictures: [],
+      error: null,
+    });
   };
 
   toggleModal = (largeImg, tags) => {
@@ -96,43 +82,37 @@ class App extends Component {
     }));
   };
 
-  // checkStatus = () => {
-  //   const { status } = this.state;
-
-  //   if (status === "pending") {
-  //     return (
-  //       <SpinnerDotted
-  //         size={80}
-  //         color="rgb(130, 183, 231)"
-  //         thickness={100}
-  //         style={{
-  //           display: "block",
-  //           margin: "0 auto",
-  //           marginTop: "16px",
-  //         }}
-  //       />
-  //     );
-  //   }
-
-  //   if (status === "resolved") {
-  //     return <LoadMoreButton onClick={this.onLoadMoreClick} />;
-  //   }
-  // };
-
   render() {
-    const { showModal, largeImg, tags, pictures } = this.state;
+    const { showModal, largeImg, tags, pictures, totalHits, isLoading, error } =
+      this.state;
     return (
       <>
+        {error && <p>{`Ooops... something went wrong: ${error}`} </p>}
+
         <Searchbar onSubmit={this.formSubmitHandler} />
         <ImageGallery picturesList={pictures} openModal={this.toggleModal} />
-        {pictures.length !== 0 && (
-          <LoadMoreButton onClick={this.onLoadMoreClick} />
-        )}
-        {/* {this.checkStatus()} */}
+
         {showModal && (
           <Modal onClose={this.toggleModal}>
             <img src={largeImg} alt={tags} />
           </Modal>
+        )}
+
+        {totalHits > 12 && !isLoading && (
+          <LoadMoreButton onClick={this.fetchImg} />
+        )}
+
+        {isLoading && (
+          <SpinnerDotted
+            size={80}
+            color="rgb(130, 183, 231)"
+            thickness={100}
+            style={{
+              display: "block",
+              margin: "0 auto",
+              marginTop: "16px",
+            }}
+          />
         )}
 
         <Toaster

@@ -8,8 +8,6 @@ export default function ImageGallery({ picturesList, openModal }) {
       {picturesList.map((picture, index) => {
         const { id, webformatURL, largeImageURL } = picture;
 
-        console.log(index);
-
         return (
           <ImageGalleryItem
             key={index}
